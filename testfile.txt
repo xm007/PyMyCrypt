@@ -1,0 +1,261 @@
+1、OWASP top 10 了解吗？说说。
+
+1.访问控制中断 目录遍历 跨站请求伪造(CSRF)
+2.密码故障 未加密通讯
+3.注入 sql注入 命令行注入
+4.不安全设计 信息泄露 文件上传漏洞 
+不安全设计关注与设计缺陷相关的风险。不安全设计是指没有威胁建模、安全设计模式和原则以及参考体系结构的设计
+5.安全配置错误 
+好的安全需要对应用程序、框架、应用程序服务器、web服务器、数据库服务器和平台定义和执行安全配置。由于许多设置的默认值并不是安全的，因此，必须定义、实施和维护这些设置。这包含了对所有的软件保持及时地更新，包括所有应用程序的库文件。
+6.易损坏和过期的组件 有害的依赖
+7.识别和认证失败 
+身份验证和身份验证失败以前被称之为“身份验证失败”，是指身份验证实施不当，使攻击者获得访问权限并冒充另一用户的身份
+8.软件和数据完整性故障 
+软件和数据完整性故障集中于在未验证完整性的情况下对软件更新、关键数据和CI/CD数据传递通道所做的假设。
+此外，该漏洞还包括不安全的反序列化。不安全的反序列化指的是任何应用程序无法对易受攻击的外部或外部对象反序列化。这是因为黑客有能力对后端代码接收到的数据进行操纵。
+保护自己不受不安全反序列化影响的最快而且可能也是最安全的方法就是不接受来自不受信任源的序列化对象，并在应用程序中限制使用序列化对象
+9.安全日志记录和监控故障
+10.服务器端请求伪造(SSRF) 
+SSRF(Server-Side Request Forgery:服务器端请求伪造) 是一种由攻击者构造形成由服务端发起请求的一个安全漏洞。
+一般情况下，SSRF攻击的目标是从外网无法访问的内部系统。（正是因为它是由服务端发起的，所以它能够请求到与它相连而与外网隔离的内部系统）
+SSRF 形成的原因大都是由于服务端提供了从其他服务器应用获取数据的功能且没有对目标地址做过滤与限制。
+
+2、说说SQL注入，类型，报错注入的函数，防御措施有哪些？工具说说，常用命令，有没有实际挖掘经验，具体说说？
+
+SQL注入：
+1.SQL注入原理
+服务器没有对输入字符进行过滤导致恶意代码被当做正常的sql语句被执行
+2.SQL注入分类
+按照执行结果方式分类：联合查询注入、报错注入、时间盲注、布尔盲注、堆叠注入
+按照HTTP请求可以分为：get、post、http头注入（Cookie、UA、Host等）
+按照传入参数类型可以分为：数字型id=$id 字符型id=’$id’,搜索型like
+3.SQL注入防御
+代码层：进行严格的转义和过滤，使用预处理和参数化
+网络层：WAF、云端防护
+中间件配置防御
+4.SQL注入判断注入点的思路
+只要和数据库产生交互的地方就有可能是注入点，输入SQL看是否可以产生报错或者不一样的回显。
+对于get型的注入，判断是否存在 Sql 注入漏洞
+最为经典的单引号判断法：id=1' 
+数字型判断：and 1=1 和and 1=2
+字符型判断： and ‘1’='1 和 and ‘1’='2 加入单引号
+搜索型判断：and '%'=' 
+POST型注入抓包进行修改，需要手工转码。
+布尔盲注：and 1=1 和and 1=2，
+   函数：length、substr、ascii
+时间盲注：and sleep（5），F12看network里面的响应时间。还可以使用benchmark、笛卡尔积等
+5.报错注入的函数有哪些?
+updatexml()函数:对XML文件进行查询修改的xpath函数、
+floor()函数:mysql中用来取整的函数。
+extractvalue()函数:对XML文件进行查询的xpath函数
+防御:
+（1）代码层
+01.黑名单
+02.白名单
+03.敏感字符过滤
+04.使用框架安全查询
+05.规范输出
+（2）配置层
+01.开启GPC(php中的magic_quotes_gpc是配置在php.ini中的，他的作用类似addslashes()，就是对输入的字符创中的字符进行转义处理。他可以对$_POST、$__GET以及进行数据库操作的sql进行转义处理，防止sql注入。)
+02.使用UTF-8
+（3）物理层
+01.WAF
+02.数据库审计
+03.云防护
+04.IPS(入侵防御系统)
+01.使用安全的API
+02.对输入的特殊字符进行Escape转义处理
+03.使用白名单来规范化输入验证方法
+04.对客户端输入进行控制，不允许输入SQL注入相关的特殊字符
+05.服务器端在提交数据库进行SQL查询之前，对特殊字符进行过滤、转义、替换、删除。
+https://blog.csdn.net/weixin_52118430/article/details/124072787
+
+3、文件上传漏洞说说？常用的webshell说说。流量特征分析过吗，具体说一下。冰蝎的加密方式说说。
+
+哥斯拉，冰蝎，菜刀，蚁剑
+菜刀webshell动态特征:
+请求包中：
+ua头为百度爬虫
+请求体中存在eavl，base64等特征字符
+请求体中传递的payload为base64编码，并且存在固定的QGluaV9zZXQoImRpc3BsYXlfZXJyb3JzIiwiMCIpO0BzZXRfdGltZV9saW1pdCgwKTtpZihQSFBfVkVSU0lPTjwnNS4zLjAnKXtAc2V0X21hZ2ljX3F1b3Rlc19ydW50aW1lKDApO307ZWNobygiWEBZIik7J
+请求体中执行结果响应为明文，格式为X@Y    结果   X@Y之中
+蚁剑webshell动态特征:
+默认编码连接时
+每个请求体都存在@ini_set(“display_errors”, “0”);@set_time_limit(0)开头。并且存在base64等字符
+响应包的结果返回格式为  随机数 结果  随机数
+使用base64编码器和解码器时
+蚁剑会随机生成一个参数传入base64编码后的代码，密码参数的值是通过POST获取随机参数的值然后进行base64解码后使用eval执行
+响应包的结果返回格式为  随机数 编码后的结果  随机数
+冰蝎3.0 webshell木马动态特征
+在3.0中改了，去除了动态密钥协商机制，采用预共享密钥，全程无明文交互，密钥格式为md5(“admin”)[0:16],但还是会存在一些特征
+在使用命令执行功能时，请求包中content-length 为5740或5720（可能会根据Java版本而改变）
+每一个请求头中存在Pragma: no-cache，Cache-Control: no-cache
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+哥斯拉webshell动态特征
+所有请求中Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+所有响应中Cache-Control: no-store, no-cache, must-revalidate,
+以上两个只能作为弱特征参考
+同时在所有请求中Cookie中后面都存在；特征
+https://blog.csdn.net/weixin_46684578/article/details/122350718
+分为密钥交换阶段和加密通信阶段
+密钥交换阶段：
+返回16位的密钥，是从md5中截取的（md5不区分大小写，解密后内容相同）
+加密通信阶段：
+base64加密，然后再AES 或 XOR 加密
+
+4、文件包含用到的协议？文件包含伪协议有了解吗？
+file:// 协议：
+        条件 allow_url_fopen:off/on  allow_url_include :off/on
+        作用：用于访问本地文件系统。在include()/require()等参数可控的情况下
+             如果导入非php文件也会被解析为php
+        用法：
+            1.file://[文件的绝对路径和文件名]
+            2.[文件的相对路径和文件名]
+            3.[http：//网络路径和文件名]
+php:// 协议：
+        常见形式：php://input php://stdin php://memory php://temp
+        条件 allow_url_include需要 on allow_url_fopen:off/on
+        作用：php:// 访问各个输入/输出流（I/O streams），在CTF中经常使用的是php://filter
+            和php://input，php://filter用于读取源码，php://input用于执行php代码
+        php://filter参数详解：resource=（必选，指定了你要筛选过滤的数据流）     
+        read=（可选）    write=（可选）
+        对read和write，可选过滤器有string.rot13、string.toupper
+        、string.tolower、string.strip_tags、convert.base64-encode 
+        & convert.base64-decode
+         用法举例：php://filter/read=convert.base64-encode/resource=flag.php
+                    网址+?page=php://filter/convert.base64-encode/resource=文件名
+zip:// bzip2:// zlib:// 协议：
+        条件：allow_url_fopen:off/on      allow_url_include :off/on
+        作用：zip:// & bzip2:// & zlib:// 均属于压缩流，可以访问压缩文件中的子文件
+            更重要的是不需要指定后缀名
+        用法：zip://[压缩文件绝对路径]%23[压缩文件内的子文件名]
+             compress.bzip2://file.bz2
+             compress.zlib://file.gz
+        其中phar://和zip://类似
+data:// 协议：
+        条件：allow_url_fopen:on    allow_url_include :on
+        作用：可以使用data://数据流封装器，以传递相应格式的数据。通常可以用来执行PHP代码。
+        用法：data://text/plain,            data://text/plain;base64,
+        举例：data://text/plain,<?php%20phpinfo();?>
+             data://text/plain;base64,PD9waHAgcGhwaW5mbygpOz8%2b
+
+5、发现了一个文件下载的点，一般会如何利用呢？Windows和Linux分别说说。
+https://www.freebuf.com/articles/web/334810.html
+
+6、XSS说说类型，区别，利用方式和防御。
+
+分类：反射性、存储型和DOM型
+‍危害：前端钓鱼、盗取cookie、键盘记录，前端挖矿、网页挂马。DDOS浏览器和结合其他漏洞的利用。
+DOM，全称Document Object Model，是一个平台和语言都中立的接口，可以使程序和脚本能够动态访问和更新文档的内容、结构以及样式。
+DOM型XSS其实是一种特殊类型的反射型XSS，它是基于DOM文档对象模型的一种漏洞。
+https://zhuanlan.zhihu.com/p/134303544
+防御：输入做过滤，输出做转义。对用户的输入(和URL参数)进行过滤，对输出进行html编码
+
+7、绕WAF有经验吗？说说绕过哪几个，方法。文件上传绕waf的经验说说。
+
+3.waf绕过文件上传
+1.寻找黑名单之外的文件扩展名
+2.构造畸形数据包，打乱WAF检测
+3.把文件名参数filename变畸形，尝试内容输出溢出
+4.函数替换，比如java中的Runtime.getRuntime().exec()被拦截可以试试ProcessBuilder类来替换。
+5.数据截断-文件名中加入图片后缀提前用分号截断
+
+8、判断注入点的方法，具体说说。发现注入以后的思路。
+
+只要和数据库产生交互的地方就有可能是注入点，输入SQL看是否可以产生报错或者不一样的回显。
+对于get型的注入，判断是否存在 Sql 注入漏洞
+最为经典的单引号判断法：id=1' 
+数字型判断：and 1=1 和and 1=2
+字符型判断： and ‘1’='1 和 and ‘1’='2 加入单引号
+搜索型判断：and '%'=' 
+POST型注入抓包进行修改，需要手工转码。
+布尔盲注：and 1=1 和and 1=2，
+   函数：length、substr、ascii
+时间盲注：and sleep（5），F12看network里面的响应时间。还可以使用benchmark、笛卡尔积等
+
+9、中间件常见的有哪些，分别有哪些漏洞，说是默认端口。
+
+1.常见的中间件及漏洞
+weblogic、tomcat、IIS、Apache、Jboss、Nginx、websphere
+IIS：PUT漏洞、短文件名猜解、远程代码执行、解析漏洞
+Apache：解析漏洞、目录遍历
+Nginx：文件解析、目录遍历、CRLF注入、目录穿越
+Tomcat：远程代码执行、war后门文件部署
+JBoss：反序列化漏洞、war后门文件部署
+WebLogic：反序列化漏洞、SSRF任意文件上传、war后门文件部署
+
+10、说说常见的框架，有哪些漏洞，最新漏洞的影响范围。了解最新的漏洞吗，说说。有复现过哪些？记得哪记得的特征。
+
+常见的框架漏洞有哪些
+fastjson：反序列化漏洞，Fastjson 是阿里开源的一个 Java 库，可以将 Java 对象转换为 JSON 格式，当然它也可以将 JSON 字符串转换为 Java 对象。
+shiro：反序列化漏洞。Apache Shiro是常见的Java安全框架，执行身份验证、授权、密码和会话管理。只要rememberMe的AES加密秘钥泄露，就会导致shiro的反序列化漏洞。
+spring：远程命令执行、远程代码执行漏洞。Spring框架是一个开放源代码的J2EE应用程序框架，由Rod Johnson发起，是针对bean的生命周期进行管理的轻量级容器（lightweight container），主要原因是从spring引入SpEL表达式引起的。
+structs2：远程命令执行等，存在超过58个漏洞。Struts2是一个基于MVC设计模式的Web应用框架，它本质上相当于一个servlet，在MVC设计模式中，Struts2作为控制器(Controller)来建立模型与视图的数据交互。主要是OGNL 表达式注入漏洞
+Thinkphp：远程命令执行、SQL注入等thinkPHP是一个快速、兼容而且简单的轻量级国产PHP开发框架
+
+11、SSRF漏洞说说？有挖掘过吗？了解redies？端口？常见漏洞？
+
+SSRF的原理危害和防御?
+SSRF服务器端请求伪造：服务器提供了从其他服务器应用获取数据的功能，但是又没对目标地址进行严格的过滤和限制，导致攻击者可以传入任意的地址让后端的服务器发起请求并返回该目标地址的数据
+危害：内外网的的端口和服务扫描、攻击内网或者本地的程序、对内网进行指纹识别，识别企业内部资产信息、攻击内网的web应用。利用file协议读取本地敏感文件等
+防御：
+    1、过滤返回的信息
+    2、统一错误信息（避免进行判断） 
+    3、限制请求的端口
+    4、禁止不常用的协议仅仅允许HTTP和https，防止file、Gopher和ftp协议
+    5、设置DNS缓存或者Host白名单的方式 。    
+    6、解析访问的地址如果是内网的话就拒绝请求。
+    7、对数据做类型检验，对于类型不符的内容，拒绝返回响应数据
+三.redis未授权(提权方法，如何利用，形成方法)
+（1）redis绑定在 0.0.0.0:6379，且没有进行添加防火墙规则避免其他非信任来源 ip 访问等相关安全策略，直接暴露在公网；
+（2）没有设置密码认证（一般为空），可以免密码远程登录redis服务。 
+利用 Redis 自身的提供的config 命令，可以进行写文件操作，攻击者可以成功将自己的ssh公钥写入目标服务器的 /root/.ssh 文件夹的authotrized_keys 文件中，进而可以使用对应私钥直接使用ssh服务登录目标服务器。
+
+12、常见的Windows和Linux系统的命令说说。
+linux: 查看进程ps，加参数比如ps -aux ，杀死进程kill -9 加上PID，或者killall -9 python程序名
+Windows：查看进程tasklist ，杀死进程taskkill /im XXX、taskkill /pid XXX 、taskkill /f XXX
+
+13、做过日志分析吗，说说经验。存放位置，日志信息，重点关注的地方是什么？
+
+3.Windows日志分析
+Window事件日志：
+系统日志，位置在System32\Winevt\Logs\System.evtx
+ 按 "Window+R"，输入 ”eventvwr.msc“ 
+也可以直接进入“事件查看器”应用程序日志，位置在\System32\Winevt\Logs\Application.evtx，
+安全日志，位置在System32\Winevt\Logs\Security.evtx
+常见的事件ID
+4624登录成功
+4625登录失败
+4634注销成功
+4647用户启动的注销
+4672管理员登录
+4720创建用户，
+   日志分析工具：Log Parser、360 星图、 Event Log Explorer。.
+4.linux日志分析
+ Linux日志分析
+       日志默认存放的位置：/var/log/
+查看日志默认情况：more /etc/rsyslog.conf
+比较重要的几个日志：
+●登录失败记录：/var/log/btmp //lastb  
+●最后一次登录：/var/log/lastlog  
+●登录成功记录: /var/log/wtmp //last
+●登录日志记录：/var/log/secure
+●目前登录用户信息：/var/run/utmp //w、who、users
+历史命令记录：history
+Linux日志筛选：
+利用less、more、cat、grep加条件、find、head、tail、sed命令以及固定的查询命令
+Less和more：less可以随意浏览文件，more只能向下
+cat 显示文件全部内容
+grep查找文件中符合条件的字符串
+find 查找
+head、tail 前10行和最后10行，
+Sed：查找特定的一段时间范围和行号 
+
+14、手工查杀的经验说说。比如一台服务器中了挖矿病毒，有啥特征，你的排查思路。
+https://www.freebuf.com/articles/system/170211.html
+
+15、有护网经验吗？
+
+16、有挖掘SRC经验吗？有证书吗？
+
+17、护网时间能保证吗？你有什么问题？
