@@ -35,7 +35,7 @@ with open("testfile.txt", "rb") as data:
         [f.write(x) for x in (enc_session_key, cipher_aes.nonce, tag, ciphertext)]
 
 # ========================================
-# decrypt
+# 解密
 # ========================================
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
