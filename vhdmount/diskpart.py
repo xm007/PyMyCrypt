@@ -29,14 +29,14 @@ def parse_last_volume_number(diskpart_message) -> int:
         max_numb = re.search('\d',match[len(match) - 1]).group()
     return max_numb
 
-def diskpart_create_vdisk(filelocation: str,size: int,g_DebugEnabled: bool = False):
+def diskpart_create_vdisk(filelocation: str,size: int,format: str,g_DebugEnabled: bool = False):
     ret_locale_lang = get_locale_lang()
     p = subprocess.Popen("diskpart", stdin=subprocess.PIPE, stdout=subprocess.PIPE, env=os.environ, )
     res1 = p.stdin.write(bytes(f"CREATE VDISK FILE={filelocation} maximum={size}\n", 'utf-8'))
     res1 = p.stdin.write(bytes(f"SELECT VDISK FILE={filelocation}\n", 'utf-8'))
     res1 = p.stdin.write(bytes(f"ATTACH VDISK\n", 'utf-8'))
     res1 = p.stdin.write(bytes(f"CREATE PARTITION PRIMARY\n", 'utf-8'))
-    res1 = p.stdin.write(bytes(f"FORMAT FS=NTFS QUICK\n", 'utf-8'))
+    res1 = p.stdin.write(bytes(f"FORMAT FS={format} QUICK\n", 'utf-8'))
     res1 = p.stdin.write(bytes(f"ASSIGN\n", 'utf-8'))
 
     stdout, stderr = p.communicate()
@@ -47,6 +47,7 @@ def diskpart_create_vdisk(filelocation: str,size: int,g_DebugEnabled: bool = Fal
         print(output)
 
     p.kill()
+    return last_volume_index
 
 def diskpart_attach_vdisk(vhd_file_path: str,g_DebugEnabled: bool = False, readonly: bool = False) -> int:
     ret_locale_lang = get_locale_lang()
