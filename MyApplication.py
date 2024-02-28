@@ -138,8 +138,18 @@ class MyApplication(QtWidgets.QMainWindow):
         #     self.last_volumn_index = vdisk.diskpart_attach_vdisk(abs_path)
 
     def UnmountVHD(self):
+        # 读取VHD加密参数
+        algorithm = self.comboBoxAlgorithmManageVHD.currentText()
+        mode = self.comboBoxModeManageVHD.currentText()
+        password = self.lineEditPassManageVHD.text()
         # 卸载虚拟硬盘
         vdisk.diskpart_unmount(self.currentVHDfilepath, self.last_volumn_index)
+        # 重新加密硬盘
+        if algorithm == "3DES":
+            tripledes.encrypt_file_withpassword(self.currentVHDfilepath,password,mode,sizes[algorithm])
+        elif algorithm in ("AES-128", "AES-196", "AES-256"):
+            aes.encrypt_file_withpassword(self.currentVHDfilepath,password,mode,sizes[algorithm])
+
 
         # 重置参数
         self.currentVHDfilepath = ""
@@ -149,7 +159,7 @@ class MyApplication(QtWidgets.QMainWindow):
         # 读取加密参数
         algorithm = self.comboBoxAlgorithmEncryptFile.currentText()
         mode = self.comboBoxModeEncryptFile.currentText()
-        password = self.lineEditPassCryptVHDEncryptFile.text()
+        password = self.lineEditPassEncryptFile.text()
 
         # 选择文件
         options = QtWidgets.QFileDialog.Options()
