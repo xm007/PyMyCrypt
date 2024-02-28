@@ -194,7 +194,7 @@ class MyApplication(QtWidgets.QMainWindow):
 
         # 选择加载路径
         options = QtWidgets.QFileDialog.Options()
-        filePath, _ = QtWidgets.QFileDialog.getOpenFileName(self, "选择磁盘文件", "", "任意文件(*.*)",
+        filePath, _ = QtWidgets.QFileDialog.getOpenFileName(self, "选择加密文件", "", "任意文件(*.*)",
                                                             options=options)
         if not filePath:
             return
@@ -317,9 +317,9 @@ class MyApplication(QtWidgets.QMainWindow):
         else:
             publickey, privatekey = createkey.generate_ecc()
 
-        with open(publicpem_path+'.pem','w') as publicpem:
+        with open(publicpem_path+'.pem','wb') as publicpem:
             publicpem.write(publickey)
-        with open(privatepem_path+'.pem', 'w') as privatepem:
+        with open(privatepem_path+'.pem','wb') as privatepem:
             privatepem.write(privatekey)
 
     def SignGenerate(self):
