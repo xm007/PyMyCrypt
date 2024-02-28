@@ -1043,7 +1043,7 @@
        <rect>
         <x>20</x>
         <y>10</y>
-        <width>111</width>
+        <width>124</width>
         <height>22</height>
        </rect>
       </property>
@@ -1114,7 +1114,7 @@
     </widget>
     <widget class="QWidget" name="tab_9">
      <attribute name="title">
-      <string>生成RSA</string>
+      <string>生成对称密钥</string>
      </attribute>
      <widget class="QWidget" name="horizontalLayoutWidget_10">
       <property name="geometry">
@@ -1135,6 +1135,42 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="layoutWidget_14">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>10</y>
+        <width>121</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_13">
+       <item>
+        <widget class="QLabel" name="label_23">
+         <property name="text">
+          <string>加密算法:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboBoxAlgorithmRSAGen">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <item>
+          <property name="text">
+           <string>RSA</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>ECC</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_8">
      <attribute name="title">
@@ -1144,8 +1180,8 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>10</y>
-        <width>124</width>
+        <y>40</y>
+        <width>121</width>
         <height>22</height>
        </rect>
       </property>
@@ -1215,6 +1251,42 @@
          <property name="text">
           <string>验证数字签名!</string>
          </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="layoutWidget_16">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>10</y>
+        <width>121</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_25">
+       <item>
+        <widget class="QLabel" name="label_26">
+         <property name="text">
+          <string>加密算法:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboBoxAlgorithmSign">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <item>
+          <property name="text">
+           <string>RSA</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>ECC</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>

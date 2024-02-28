@@ -281,6 +281,8 @@ class MyApplication(QtWidgets.QMainWindow):
             QMessageBox.warning(self, "验证结果", "文件验证失败！", QMessageBox.Ok)
 
     def RSAGenerate(self):
+        # 读取参数
+        algorithm = self.comboBoxAlgorithmRSAGen.currentText()
         # 选择保存位置
         options = QtWidgets.QFileDialog.Options()
         options |= QtWidgets.QFileDialog.DontUseNativeDialog
@@ -300,14 +302,19 @@ class MyApplication(QtWidgets.QMainWindow):
         privatepem_path = os.path.abspath(privatepem_path)
 
         # 生成公钥私钥
-        publickey,privatekey = createkey.generate_rsa()
-        with open(publicpem_path+'.pem','wb') as publicpem:
+        if algorithm == "RSA":
+            publickey,privatekey = createkey.generate_rsa()
+        else:
+            publickey, privatekey = createkey.generate_ecc()
+
+        with open(publicpem_path+'.pem','w') as publicpem:
             publicpem.write(publickey)
-        with open(privatepem_path+'.pem', 'wb') as privatepem:
+        with open(privatepem_path+'.pem', 'w') as privatepem:
             privatepem.write(privatekey)
 
     def SignGenerate(self):
         # 读取参数
+        algorithm = self.comboBoxAlgorithmSign.currentText()
         mode = self.comboBoxHashModeSign.currentText()
 
         # 选择加载路径
@@ -337,10 +344,14 @@ class MyApplication(QtWidgets.QMainWindow):
         # saveas_path = os.path.abspath(saveas_path)
 
         # 保存签名
-        createkey.sign_file(abs_path,privatepem_path,abs_path+'.sign',mode)
+        if algorithm == 'ECC':
+            createkey.sign_file(abs_path, privatepem_path, abs_path + '.sign', mode='SHA256', algorithm='ECC')
+        else:
+            createkey.sign_file(abs_path, privatepem_path, abs_path + '.sign', mode, algorithm)
 
     def SignVerify(self):
         # 读取参数
+        algorithm = self.comboBoxAlgorithmSign.currentText()
         mode = self.comboBoxHashModeSign.currentText()
 
         # 选择加载路径
@@ -368,7 +379,11 @@ class MyApplication(QtWidgets.QMainWindow):
         signPath = os.path.abspath(signPath)
 
         # 验证HASH
-        if createkey.verify_signature(abs_path,signPath,publicpem_path,mode):
+        if algorithm == "ECC":
+            isVerified = createkey.verify_signature(abs_path,signPath,publicpem_path,mode='SHA256',algorithm='ECC')
+        else:
+            isVerified = createkey.verify_signature(abs_path, signPath, publicpem_path, mode, algorithm)
+        if isVerified:
             QMessageBox.information(self, "验证结果", "文件验证成功！", QMessageBox.Ok)
         else:
             QMessageBox.warning(self, "验证结果", "文件验证失败！", QMessageBox.Ok)
